@@ -1,60 +1,39 @@
-FROM php:7.4-fpm
+FROM php:8.1-fpm
 
-# Copy composer.lock and composer.json
-COPY composer.lock composer.json /var/www/
-
-# Set working directory
-WORKDIR /var/www
-
-# Install dependencies
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     libpng-dev \
-#     libjpeg62-turbo-dev \
-#     libfreetype6-dev \
-#     locales \
-#     zip \
-#     jpegoptim optipng pngquant gifsicle \
-#     unzip \
-#     git \
-#     curl \
-#     libzip-dev
-
+# Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libzip-dev \
+    git \
+    curl \
     libpng-dev \
-    libjpeg62-turbo-dev \
-    libxml2 \
-    wget
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    default-mysql-client
 
-# RUN pecl install xdebug-2.9.2 \
-# 	&& docker-php-ext-enable xdebug \
-#     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
-# Clear cache
+# Limpar cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install extensions
-RUN docker-php-ext-install pdo_mysql zip exif pcntl
-RUN docker-php-ext-install gd && docker-php-ext-enable gd
+# Instalar extensões PHP
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Obter Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+# Definir diretório de trabalho
+WORKDIR /var/www
 
-# Copy existing application directory contents
-COPY . /var/www
+# Copiar arquivos do projeto
+COPY . .
 
-# Copy existing application directory permissions
-COPY --chown=www:www . /var/www
+# Instalar dependências do PHP
+RUN composer install --no-dev --optimize-autoloader
 
-# Change current user to www
-USER www
+# Dar permissões para pastas de armazenamento
+RUN chmod -R 777 storage bootstrap/cache
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
+# Expor porta (será substituída pelo Railway)
+EXPOSE 8080
+
+# Comando de inicialização
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
