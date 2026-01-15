@@ -41,14 +41,41 @@ Route::get('/', function () {
 });
 
 
-// Rota Temporária para Deploy (Executar Seed)
+
+// Rota Temporária para Deploy (Forçar Admin)
 Route::get('/run-seed', function () {
     try {
-        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return 'BANCO DE DADOS POPULADO COM SUCESSO! AGORA PODE LOGAR.';
+        // 1. Tenta rodar migrations
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+
+        // 2. Procura ou cria o usuário admin
+        $email = 'admin@ut.com';
+        $password = 'password'; // Senha simples
+
+        $user = \App\Models\User::where('email', $email)->first();
+
+        if (!$user) {
+            // Se não existe, cria (e roda seeds básicos se precisar)
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            $user = \App\Models\User::where('email', $email)->first();
+            $status = "Seed rodado. Usuário criado via Seed.";
+        } else {
+            $status = "Usuário já existia.";
+        }
+
+        // 3. FORÇA a senha correta (caso o seed tenha usado outra ou hash esteja errado)
+        if ($user) {
+            $user->password = \Illuminate\Support\Facades\Hash::make($password);
+            $user->save();
+            $status .= " Senha ATUALIZADA para: '$password'";
+        } else {
+            return "ERRO GRAVE: O usuário admin@ut.com não foi encontrado nem criado pelos seeds.";
+        }
+
+        return "SUCESSO!<br>Status: $status<br>Email: $email<br>Senha: $password<br><br>Pode tentar logar agora!";
+
     } catch (\Exception $e) {
-        return 'ERRO AO RODAR SEED: ' . $e->getMessage();
+        return 'ERRO: ' . $e->getMessage() . "<br>Trace: " . $e->getTraceAsString();
     }
 });
 
