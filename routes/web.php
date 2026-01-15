@@ -40,6 +40,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+// Rota Temporária para Deploy (Executar Seed)
+Route::get('/run-seed', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return 'BANCO DE DADOS POPULADO COM SUCESSO! AGORA PODE LOGAR.';
+    } catch (\Exception $e) {
+        return 'ERRO AO RODAR SEED: ' . $e->getMessage();
+    }
+});
+
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
