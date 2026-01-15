@@ -42,6 +42,30 @@ Route::get('/', function () {
 
 
 
+
+// Rota Temporária para Atualizar Perfil Admin
+Route::get('/update-profile', function () {
+    try {
+        // Tenta achar pelo email antigo OU novo
+        $user = \App\Models\User::where('email', 'admin@ut.com')
+            ->orWhere('email', 'eastvexpress@gmail.com')
+            ->first();
+
+        if ($user) {
+            $user->first_name = 'Elemilton';
+            $user->last_name = 'Alves';
+            $user->email = 'eastvexpress@gmail.com';
+            $user->save();
+
+            return "SUCESSO! Perfil atualizado.<br>Nome: Elemilton Alves<br>Email: eastvexpress@gmail.com<br>Senha: (A mesma de antes)";
+        } else {
+            return "ERRO: Usuário admin não encontrado.";
+        }
+    } catch (\Exception $e) {
+        return "ERRO: " . $e->getMessage();
+    }
+});
+
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
