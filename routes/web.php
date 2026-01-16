@@ -52,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('session/browse', [SchoolSessionController::class, 'browse'])->name('session.browse');
 
         Route::post('semester/create', [SemesterController::class, 'store'])->name('semester.create');
+        Route::get('semester/edit/{id}', [SemesterController::class, 'edit'])->name('semester.edit');
+        Route::post('semester/update/{id}', [SemesterController::class, 'update'])->name('semester.update');
         Route::post('final-marks-submission-status/update', [AcademicSettingController::class, 'updateFinalMarksSubmissionStatus'])->name('final.marks.submission.status.update');
 
         Route::post('attendance/type/update', [AcademicSettingController::class, 'updateAttendanceType'])->name('attendance.type.update');

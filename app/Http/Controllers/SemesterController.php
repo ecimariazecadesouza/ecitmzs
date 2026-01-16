@@ -11,10 +11,11 @@ class SemesterController extends Controller
 {
     protected $semesterRepository;
 
-    public function __construct(SemesterInterface $semesterRepository) {
+    public function __construct(SemesterInterface $semesterRepository)
+    {
         $this->semesterRepository = $semesterRepository;
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -27,6 +28,22 @@ class SemesterController extends Controller
             $this->semesterRepository->create($request->validated());
 
             return back()->with('status', 'Semester creation was successful!');
+        } catch (\Exception $e) {
+            return back()->withError($e->getMessage());
+        }
+    }
+
+    public function edit($id)
+    {
+        $semester = $this->semesterRepository->find($id);
+        return view('academics.semester-edit', compact('semester'));
+    }
+
+    public function update(SemesterStoreRequest $request, $id)
+    {
+        try {
+            $this->semesterRepository->update($request, $id);
+            return redirect()->to('academics/settings')->with('status', 'Semester updated successfully!');
         } catch (\Exception $e) {
             return back()->withError($e->getMessage());
         }
