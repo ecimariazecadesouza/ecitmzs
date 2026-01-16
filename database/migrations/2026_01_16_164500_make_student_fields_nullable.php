@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class MakeStudentFieldsNullable extends Migration
 {
@@ -13,24 +14,21 @@ class MakeStudentFieldsNullable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('gender')->nullable()->change();
-            $table->string('nationality')->nullable()->change();
-            $table->string('phone')->nullable()->change();
-            $table->string('address')->nullable()->change();
-            $table->string('address2')->nullable()->change();
-            $table->string('city')->nullable()->change();
-            $table->string('zip')->nullable()->change();
-            $table->string('email')->nullable()->change();
-        });
+        // Usando SQL puro para evitar dependência do doctrine/dbal no Laravel 8
+        DB::statement('ALTER TABLE users MODIFY COLUMN gender VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN nationality VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN phone VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN address VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN address2 VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN city VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN zip VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN email VARCHAR(255) NULL');
 
-        Schema::table('student_parent_infos', function (Blueprint $table) {
-            $table->string('father_name')->nullable()->change();
-            $table->string('father_phone')->nullable()->change();
-            $table->string('mother_name')->nullable()->change();
-            $table->string('mother_phone')->nullable()->change();
-            $table->string('parent_address')->nullable()->change();
-        });
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN father_name VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN father_phone VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN mother_name VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN mother_phone VARCHAR(255) NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN parent_address VARCHAR(255) NULL');
     }
 
     /**
@@ -40,23 +38,19 @@ class MakeStudentFieldsNullable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('gender')->nullable(false)->change();
-            $table->string('nationality')->nullable(false)->change();
-            $table->string('phone')->nullable(false)->change();
-            $table->string('address')->nullable(false)->change();
-            $table->string('address2')->nullable(false)->change();
-            $table->string('city')->nullable(false)->change();
-            $table->string('zip')->nullable(false)->change();
-            $table->string('email')->nullable(false)->change();
-        });
+        DB::statement('ALTER TABLE users MODIFY COLUMN gender VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN nationality VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN phone VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN address VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN address2 VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN city VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN zip VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE users MODIFY COLUMN email VARCHAR(255) NOT NULL');
 
-        Schema::table('student_parent_infos', function (Blueprint $table) {
-            $table->string('father_name')->nullable(false)->change();
-            $table->string('father_phone')->nullable(false)->change();
-            $table->string('mother_name')->nullable(false)->change();
-            $table->string('mother_phone')->nullable(false)->change();
-            $table->string('parent_address')->nullable(false)->change();
-        });
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN father_name VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN father_phone VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN mother_name VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN mother_phone VARCHAR(255) NOT NULL');
+        DB::statement('ALTER TABLE student_parent_infos MODIFY COLUMN parent_address VARCHAR(255) NOT NULL');
     }
 }
